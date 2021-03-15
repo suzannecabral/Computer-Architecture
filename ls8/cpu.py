@@ -5,37 +5,60 @@ import sys
 class CPU:
     """Main CPU class."""
 
-    def __init__(self):
+    def __init__(self, op, reg):
         """Construct a new CPU."""
-        pass
+        # add self.ram
+        self.ram = [0] * 255
+        # 256 slots, leave one out so it can move
+
+        # later will remove op codes, hardcoded for now
+        self.op = op
+
+        # registers are lists 8 bytes long
+        self.reg = [0] * 8
+
+        # program counter
+        self.pc = 0
+
+    # read from ram
+    
 
     def load(self):
         """Load a program into memory."""
+        
 
         address = 0
 
         # For now, we've just hardcoded a program:
 
+        # op codes - hard coded
         program = [
             # From print8.ls8
             0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
+            0b00000000, # NOP - no operation
+            0b00001000, # not listed?
             0b01000111, # PRN R0
-            0b00000000,
+            0b00000000, # NOP - no operation
             0b00000001, # HLT
         ]
 
         for instruction in program:
+            # creating a ram address for each instruction
             self.ram[address] = instruction
             address += 1
 
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
+        # alu is for mathematical operations
+        # like a calculator
+        
+        # has op
+        # has registers
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
+
         #elif op == "SUB": etc
         else:
             raise Exception("Unsupported ALU operation")
