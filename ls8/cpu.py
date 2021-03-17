@@ -74,4 +74,4 @@ class CPU:
         ir = self.reg[self.pc]
         print("self.reg",self.reg)
         print("ir",ir)
-        print("Test run complete")
+        print("Test run complete") 
