@@ -13,10 +13,10 @@ class CPU:
         self.pc = 0
 
     def ram_read(self, address):
-        pass
+        return self.ram[address]
 
     def ram_write(self, address, value):
-        pass
+        self.ram[address] = value
 
     def load(self):
         """Load a program into memory."""
@@ -72,6 +72,12 @@ class CPU:
     def run(self):
         """Run the CPU."""
         ir = self.reg[self.pc]
-        print("self.reg",self.reg)
-        print("ir",ir)
+        operand_a = self.ram_read(self.pc+1)
+        operand_b = self.ram_read(self.pc+2)
+        print("self.reg: ",self.reg)
+        print("ir: ",ir)
+        print("pc: ",self.pc)
+
+        print("a: ", operand_a)
+        print("b: ", operand_b)
         print("Test run complete") 
