@@ -71,13 +71,20 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        self.trace()
+
         ir = self.reg[self.pc]
         operand_a = self.ram_read(self.pc+1)
         operand_b = self.ram_read(self.pc+2)
-        print("self.reg: ",self.reg)
-        print("ir: ",ir)
-        print("pc: ",self.pc)
 
-        print("a: ", operand_a)
-        print("b: ", operand_b)
-        print("Test run complete") 
+        # print("self.reg: ",self.reg)
+        # print("ir: ",ir)
+        # print("pc: ",self.pc)
+
+        # print("\na: ", operand_a)
+        # print("b: ", operand_b)
+        # print("other b: ", self.ram[2])
+
+        print("ram: ", self.ram)
+
+        print("\nTest run complete") 
