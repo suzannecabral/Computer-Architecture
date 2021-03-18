@@ -2,6 +2,15 @@
 
 import sys
 
+""" 
+ls8.py runs this code:
+
+    cpu = CPU()
+
+    cpu.load()
+    cpu.run()
+
+"""
 class CPU:
     """Main CPU class."""
 
@@ -12,11 +21,14 @@ class CPU:
         
         self.pc = 0
 
-    def ram_read(self, address):
-        return self.ram[address]
+    # MAR = Memory Address Register
+    # MDR = Memory Data Register
 
-    def ram_write(self, address, value):
-        self.ram[address] = value
+    def ram_read(self, mar):
+        return self.ram[mar]
+
+    def ram_write(self, mar, mdr):
+        self.ram[mar] = mdr
 
     def load(self):
         """Load a program into memory."""
@@ -71,20 +83,31 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        self.trace()
 
-        ir = self.reg[self.pc]
-        operand_a = self.ram_read(self.pc+1)
-        operand_b = self.ram_read(self.pc+2)
+        running = True
+        while running == True:
+            # self.trace()
+            # print("self.reg: ",self.reg)
+            # print("ram: ", self.ram)
 
-        # print("self.reg: ",self.reg)
-        # print("ir: ",ir)
-        # print("pc: ",self.pc)
+            # fetch
+            cmd = self.ram[self.pc]
+            op1 = self.ram[self.pc + 1]
+            op2 = self.ram[self.pc + 2]
 
-        # print("\na: ", operand_a)
-        # print("b: ", operand_b)
-        # print("other b: ", self.ram[2])
+            # decode
+            # LDI 0b10000010
+            if cmd == 0b10000010:
+                print("This is an LDI")
+                print("Test run completed")
+                running = False
 
-        print("ram: ", self.ram)
+            # HLT 0b00000001
+            elif cmd == 0b00000001:
+                print("Program halted")
+                running = False
 
-        print("\nTest run complete") 
+            else:
+                # to print binary add :b
+                print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]:b}")
+                running = False
