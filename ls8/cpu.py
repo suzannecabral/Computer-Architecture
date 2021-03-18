@@ -24,11 +24,11 @@ class CPU:
     # MAR = Memory Address Register
     # MDR = Memory Data Register
 
-    def ram_read(self, mar):
-        return self.ram[mar]
+    def ram_read(self, addr):
+        return self.ram[addr]
 
-    def ram_write(self, mar, mdr):
-        self.ram[mar] = mdr
+    def ram_write(self, addr, data):
+        self.ram[addr] = data
 
     def load(self):
         """Load a program into memory."""
@@ -86,28 +86,33 @@ class CPU:
 
         running = True
         while running == True:
-            # self.trace()
+            self.trace()
             # print("self.reg: ",self.reg)
             # print("ram: ", self.ram)
 
             # fetch
             cmd = self.ram[self.pc]
-            op1 = self.ram[self.pc + 1]
-            op2 = self.ram[self.pc + 2]
+            operand_a = self.ram[self.pc + 1]
+            operand_b = self.ram[self.pc + 2]
 
-            # decode
-            # LDI 0b10000010
+            # LDI | 82 | 0b10000010
             if cmd == 0b10000010:
-                print("This is an LDI")
-                print("Test run completed")
-                running = False
+                # set operand_a (register #) to operand_b (integer)
+                reg_num = operand_a
+                reg_data = operand_b
 
-            # HLT 0b00000001
+                self.reg[reg_num] = reg_data
+
+                print(f"LDI: reg[{reg_num}]: {self.reg[reg_num]}")
+                self.pc += 3
+
+            # HLT | 1 | 0b00000001
             elif cmd == 0b00000001:
                 print("Program halted")
                 running = False
 
             else:
                 # to print binary add :b
-                print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]:b}")
+                print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]} | {self.ram[self.pc]:b}")
+                print("Program ended")
                 running = False
