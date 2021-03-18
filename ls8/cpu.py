@@ -35,17 +35,25 @@ class CPU:
 
         address = 0
 
+        # New way: load() from file
+        # ---------------------------------
+
+        program = []
+
+        # Old way: hardcoded program
+        # ---------------------------------
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
+        # ---------------------------------
 
         for instruction in program:
             self.ram[address] = instruction
@@ -101,20 +109,20 @@ class CPU:
 
                 self.reg[reg_num] = reg_data
 
-                print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
+                # print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
                 self.pc += 3
 
             #PRN | 71 | 0b01000111
             elif cmd == 0b01000111:
                 # print the value at register[operand_a]
                 reg_num = operand_a
-                print(f"PRINT: reg[{reg_num}]")
+                # print(f"PRINT: reg[{reg_num}]")
                 print(self.reg[reg_num])
                 self.pc += 2
 
             # HLT | 1 | 0b00000001
             elif cmd == 0b00000001:
-                print("HALT")
+                # print("HALT")
                 running = False
 
             else:
