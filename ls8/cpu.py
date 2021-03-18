@@ -86,9 +86,7 @@ class CPU:
 
         running = True
         while running == True:
-            self.trace()
-            # print("self.reg: ",self.reg)
-            # print("ram: ", self.ram)
+            # self.trace()
 
             # fetch
             cmd = self.ram[self.pc]
@@ -103,16 +101,23 @@ class CPU:
 
                 self.reg[reg_num] = reg_data
 
-                print(f"LDI: reg[{reg_num}]: {self.reg[reg_num]}")
+                print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
                 self.pc += 3
+
+            #PRN | 71 | 0b01000111
+            elif cmd == 0b01000111:
+                # print the value at register[operand_a]
+                reg_num = operand_a
+                print(f"PRINT: reg[{reg_num}]")
+                print(self.reg[reg_num])
+                self.pc += 2
 
             # HLT | 1 | 0b00000001
             elif cmd == 0b00000001:
-                print("Program halted")
+                print("HALT")
                 running = False
 
             else:
                 # to print binary add :b
                 print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]} | {self.ram[self.pc]:b}")
-                print("Program ended")
                 running = False
