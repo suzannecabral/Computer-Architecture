@@ -99,6 +99,42 @@ class CPU:
         """Run the CPU."""
         self.running = True
 
+        # HLT | 1 | 0b00000001
+        def run_hlt(self):
+            # Stop the program
+            # print("HALT")
+            self.running = False
+
+        # TODO RET | 17 | 0b00010001
+        def run_ret(self):
+            # return from the subroutine
+            # pop the value from the top of the stack
+            # store the value in the pc (program counter)
+            print("RET")
+
+        # TODO PUSH | 69 | 0b1000101
+        def run_push(self):
+            # push a value to the stack
+            # decrement the stack pointer (sp)
+            # copy the value in reg[op_a] to ram[sp]
+            print("PUSH")
+            self.pc += 2
+
+        # TODO POP | 70 | 0b01000110 
+        def run_pop(self):
+            # pop the value at the top of the stack
+            # into reg[op_a]
+            # increment stack pointer
+            print("POP")
+            self.pc += 2
+
+        # PRN | 71 | 0b01000111
+        def run_prn(self):
+            # print the value at reg[op_a]
+            # print("PRN")
+            print(self.reg[operand_a])
+            self.pc += 2
+
         # LDI | 82 | 0b10000010
         def run_ldi(self):
             # load integer(op_b) into reg[op_a]
@@ -109,36 +145,29 @@ class CPU:
 
             self.pc += 3   
 
-        # PRN | 71 | 0b01000111
-        def run_prn(self):
-            # print the value at reg[op_a]
-            # print("PRN")
-            print(self.reg[operand_a])
-            self.pc += 2
-
-        # ADD (alu) | 0b10100000 | 160
+        # ADD (alu) | 160 | 0b10100000 
         def run_add(self):
             # using the ALU: reg[op_a] += reg[op_b]
             # print("ADD")
             self.alu("ADD",operand_a,operand_b)
             self.pc += 3
 
-        # MUL (alu) | 0b10100010 | 162
+        # MUL (alu) | 162 | 0b10100010
         def run_mul(self):
             # using the ALU: reg[op_a] *= reg[op_b]
             # print("MUL")
             self.alu("MUL",operand_a,operand_b)
             self.pc += 3
 
-        # HLT | 1 | 0b00000001
-        def run_hlt(self):
-            # Stop the program
-            # print("HALT")
-            self.running = False
-
         dispatch = {
             # HLT | 1 | 0b00000001
             0b00000001: run_hlt,
+            # RET | 17 | 0b00010001
+            0b00010001: run_ret,
+            # PUSH | 69 | 0b1000101
+            0b1000101: run_push,
+            # POP | 70 | 0b01000110 
+            0b01000110: run_pop,
             # PRN | 71 | 0b01000111
             0b01000111: run_prn,
             # LDI | 82 | 0b10000010
