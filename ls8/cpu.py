@@ -24,6 +24,8 @@ class CPU:
     # MAR = Memory Address Register
     # MDR = Memory Data Register
 
+    # using "addr" and "data" for readability
+
     def ram_read(self, addr):
         return self.ram[addr]
 
@@ -35,7 +37,7 @@ class CPU:
 
         ram_addr = 0
 
-        # New way: load() from file
+        # New way: load from file
         # ---------------------------------
         # sys.argv[1] reads the user's cmd line input after this python filename
         # int("num_string", 2) converts binary string to int
