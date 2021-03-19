@@ -33,19 +33,39 @@ class CPU:
     def load(self):
         """Load a program into memory."""
 
-        address = 0
+        ram_addr = 0
 
         # New way: load() from file
         # ---------------------------------
         # sys.argv[1] reads the user's cmd line input after this python filename
-
         # int("num_string", 2) converts binary string to int
 
+
+
         program = []
+        program_file = open(sys.argv[1], 'r')
+
+        for line in program_file:
+            if line[0]=="#":
+                continue
+            
+            elif line[0].isspace()==True:
+                continue
+
+            else:
+                formatted_line = int(line[0:8],2)
+                program.append(formatted_line)
+
+        print(program)
+        program_file.close()
+
+
 
         # Old way: hardcoded program
         # ---------------------------------
         # For now, we've just hardcoded a program:
+
+
 
         # program = [
         #     # From print8.ls8
@@ -56,11 +76,13 @@ class CPU:
         #     0b00000000,
         #     0b00000001, # HLT
         # ]
+
+
         # ---------------------------------
 
         for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+            self.ram[ram_addr] = instruction
+            ram_addr += 1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -97,7 +119,9 @@ class CPU:
 
         running = True
         while running == True:
-            # self.trace()
+
+            # run this for debugging
+            self.trace()
 
             # fetch
             cmd = self.ram[self.pc]
@@ -131,4 +155,5 @@ class CPU:
             else:
                 # to print binary add :b
                 print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]} | {self.ram[self.pc]:b}")
+                print("Program exited")
                 running = False
