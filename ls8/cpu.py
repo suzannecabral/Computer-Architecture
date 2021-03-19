@@ -58,7 +58,7 @@ class CPU:
                 formatted_line = int(line[0:8],2)
                 program.append(formatted_line)
 
-        print(program)
+        # print(program)
         program_file.close()
 
 
@@ -86,13 +86,14 @@ class CPU:
             self.ram[ram_addr] = instruction
             ram_addr += 1
 
-
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -123,16 +124,18 @@ class CPU:
         while running == True:
 
             # run this for debugging
-            self.trace()
+            # self.trace()
 
             # fetch
-            cmd = self.ram[self.pc]
+            cmd_code = self.ram[self.pc]
+
             operand_a = self.ram[self.pc + 1]
             operand_b = self.ram[self.pc + 2]
 
             # LDI | 82 | 0b10000010
-            if cmd == 0b10000010:
+            if cmd_code == 0b10000010:
                 # set operand_a (register #) to operand_b (integer)
+                # print("LDI")
                 reg_num = operand_a
                 reg_data = operand_b
 
@@ -141,16 +144,28 @@ class CPU:
                 # print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
                 self.pc += 3
 
-            #PRN | 71 | 0b01000111
-            elif cmd == 0b01000111:
+            # PRN | 71 | 0b01000111
+            elif cmd_code == 0b01000111:
                 # print the value at register[operand_a]
+                # print("PRN")
                 reg_num = operand_a
-                # print(f"PRINT: reg[{reg_num}]")
                 print(self.reg[reg_num])
                 self.pc += 2
 
+            # ADD (alu) | 0b10100000 | 160
+            elif cmd_code == 0b10100000:
+                # print("ADD")
+                self.alu("ADD",operand_a,operand_b)
+                self.pc += 3
+
+            # MUL (alu) | 0b10100010 | 162
+            elif cmd_code == 0b10100010:
+                # print("MUL")
+                self.alu("MUL",operand_a,operand_b)
+                self.pc += 3
+
             # HLT | 1 | 0b00000001
-            elif cmd == 0b00000001:
+            elif cmd_code == 0b00000001:
                 # print("HALT")
                 running = False
 
