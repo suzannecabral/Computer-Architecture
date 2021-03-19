@@ -38,12 +38,10 @@ class CPU:
 
         ram_addr = 0
 
-        # New way: load from file
+        # load from file
         # ---------------------------------
         # sys.argv[1] reads the user's cmd line input after this python filename
         # int("num_string", 2) converts binary string to int
-
-
 
         program = []
         program_file = open(sys.argv[1], 'r')
@@ -62,26 +60,6 @@ class CPU:
         # print(program)
         program_file.close()
 
-
-
-        # Old way: hardcoded program
-        # ---------------------------------
-        # For now, we've just hardcoded a program:
-
-
-
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010, # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111, # PRN R0
-        #     0b00000000,
-        #     0b00000001, # HLT
-        # ]
-
-
-        # ---------------------------------
 
         for instruction in program:
             self.ram[ram_addr] = instruction
@@ -115,14 +93,11 @@ class CPU:
 
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
-
         print()
-
 
     def run(self):
         """Run the CPU."""
         self.running = True
-
 
         # LDI | 82 | 0b10000010
         def run_ldi(self):
@@ -161,18 +136,17 @@ class CPU:
             # print("HALT")
             self.running = False
 
-
         dispatch = {
-            # LDI | 82 | 0b10000010
-            0b10000010: run_ldi,
+            # HLT | 1 | 0b00000001
+            0b00000001: run_hlt,
             # PRN | 71 | 0b01000111
             0b01000111: run_prn,
+            # LDI | 82 | 0b10000010
+            0b10000010: run_ldi,
             # ADD (alu) | 160 | 0b10100000
             0b10100000: run_add,
             # MUL (alu) | 162 | 0b10100010
             0b10100010: run_mul,
-            # HLT | 1 | 0b00000001
-            0b00000001: run_hlt,
         }
 
         cmd_list = dispatch.keys()
@@ -185,8 +159,6 @@ class CPU:
 
             operand_a = self.ram[self.pc + 1]
             operand_b = self.ram[self.pc + 2]
-
-
 
             if cmd_code in cmd_list:
                 # valid command, dispatch a function
