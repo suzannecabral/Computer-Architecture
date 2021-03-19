@@ -21,6 +21,11 @@ class CPU:
         self.running = False
         
         self.pc = 0
+        
+        # stack pointer initializes at ram[f4]
+        # f4 | 244 | 0b11110100
+        # hex: 0xf4 | binary: 0b11110100
+        self.sp = 0xf4
 
     # MAR = Memory Address Register
     # MDR = Memory Data Register
@@ -33,15 +38,17 @@ class CPU:
     def ram_write(self, addr, data):
         self.ram[addr] = data
 
+    # load from file
+    # ---------------------------------
+    # sys.argv[1] reads the user's cmd line input after this python filename
+    # int("num_string", 2) converts binary string to int
+
     def load(self):
         """Load a program into memory."""
 
-        ram_addr = 0
 
-        # load from file
-        # ---------------------------------
-        # sys.argv[1] reads the user's cmd line input after this python filename
-        # int("num_string", 2) converts binary string to int
+        #program starts at ram[0]
+        ram_addr = 0
 
         program = []
         program_file = open(sys.argv[1], 'r')
@@ -60,10 +67,15 @@ class CPU:
         # print(program)
         program_file.close()
 
-
+        # load each parsed line into the ram starting at 0
         for instruction in program:
             self.ram[ram_addr] = instruction
             ram_addr += 1
+
+
+    # ALU - returns math calculations on op_a and op_b
+    # ---------------------------------
+    # Does not increment the pc
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -76,6 +88,9 @@ class CPU:
         else:
             raise Exception("Unsupported ALU operation")
 
+
+    # Trace - run self.trace() to debug
+    # ---------------------------------
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -94,11 +109,17 @@ class CPU:
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
         print()
+        
 
+    # Running Loop
+    # ---------------------------------
     def run(self):
         """Run the CPU."""
         self.running = True
 
+
+        # Run Opcodes
+        # ---------------------------------
         # HLT | 1 | 0b00000001
         def run_hlt(self):
             # Stop the program
@@ -159,6 +180,9 @@ class CPU:
             self.alu("MUL",operand_a,operand_b)
             self.pc += 3
 
+
+        # Select & Dispatch Opcodes
+        # ---------------------------------
         dispatch = {
             # HLT | 1 | 0b00000001
             0b00000001: run_hlt,
@@ -179,6 +203,10 @@ class CPU:
         }
 
         cmd_list = dispatch.keys()
+
+
+        # Loop Starts
+        # ---------------------------------
         while self.running == True:
             # run this for debugging
             # self.trace()
@@ -191,7 +219,7 @@ class CPU:
 
             if cmd_code in cmd_list:
                 # valid command, dispatch a function
-                # print(cmd_code)
+                # print("cmd:",cmd_code)
                 cmd_run=dispatch[cmd_code](self)
 
             else:
