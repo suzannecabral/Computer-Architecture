@@ -6,7 +6,7 @@
 
 ## Task List: add this to the first comment of your Pull Request
 
-### Day 1: Get `print8.ls8` running
+### ~~Day 1: Get `print8.ls8` running~~
 
 - [x] ~~Inventory what is here~~
 - [x] ~~Implement the `CPU` constructor
@@ -16,7 +16,7 @@
 - [x] ~~Add the `LDI` instruction~~
 - [x] ~~Add the `PRN` instruction~~
 
-### Day 2: Add the ability to load files dynamically, get `mult.ls8` running
+### ~~Day 2: Add the ability to load files dynamically, get `mult.ls8` running~~
 
 - [x] ~~Un-hardcode the machine code~~
 - [x] ~~Implement the `load()` function to load an `.ls8` file given the filename
