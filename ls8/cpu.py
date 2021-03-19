@@ -37,6 +37,9 @@ class CPU:
 
         # New way: load() from file
         # ---------------------------------
+        # sys.argv[1] reads the user's cmd line input after this python filename
+
+        # int("num_string", 2) converts binary string to int
 
         program = []
 
