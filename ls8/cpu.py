@@ -211,7 +211,7 @@ class CPU:
             # run this for debugging
             # self.trace()
 
-            # fetch
+            # fetch command using program counter
             cmd_code = self.ram[self.pc]
 
             operand_a = self.ram[self.pc + 1]
