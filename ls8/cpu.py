@@ -133,36 +133,42 @@ class CPU:
             # store the value in the pc (program counter)
             print("RET")
 
-        # TODO PUSH | 69 | 0b1000101
+        # PUSH | 69 | 0b1000101
         def run_push(self):
             # push a value to the stack
-            # decrement the stack pointer (sp)
             # copy the value in reg[op_a] to ram[sp]
-            print("PUSH")
+            self.ram[self.sp] = self.reg[operand_a]
+            # print(f"PUSH: {self.reg[operand_a]} to ram[{self.sp}] from reg[{operand_a}]")
+
+            # decrement the stack pointer (sp)
+            self.sp -= 1
+
             self.pc += 2
 
-        # TODO POP | 70 | 0b01000110 
+        # POP | 70 | 0b01000110 
         def run_pop(self):
             # pop the value at the top of the stack
             # into reg[op_a]
             # increment stack pointer
-            print("POP")
+            self.sp += 1
+            self.reg[operand_a] = self.ram[self.sp]
+            # print(f"POP: {self.ram[self.sp]} to reg[{operand_a}] from ram[{self.sp}]")
+
+
             self.pc += 2
 
         # PRN | 71 | 0b01000111
         def run_prn(self):
             # print the value at reg[op_a]
-            # print("PRN")
+            # print(f"PRN: {self.reg[operand_a]} from reg[{operand_a}]")
             print(self.reg[operand_a])
             self.pc += 2
 
-        # LDI | 82 | 0b10000010
+        # LDI | 130 | 0b10000010
         def run_ldi(self):
             # load integer(op_b) into reg[op_a]
-            # print("LDI")
-            reg_num = operand_a
-            reg_data = operand_b
-            self.reg[reg_num] = reg_data
+            # print(f"LDI: load {operand_b} to reg[{operand_a}]")
+            self.reg[operand_a] = operand_b
 
             self.pc += 3   
 
@@ -194,7 +200,7 @@ class CPU:
             0b01000110: run_pop,
             # PRN | 71 | 0b01000111
             0b01000111: run_prn,
-            # LDI | 82 | 0b10000010
+            # LDI | 130 | 0b10000010
             0b10000010: run_ldi,
             # ADD (alu) | 160 | 0b10100000
             0b10100000: run_add,
