@@ -18,8 +18,14 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.running = False
         
         self.pc = 0
+        
+        # stack pointer initializes at ram[f4]
+        # f4 | 244 | 0b11110100
+        # hex: 0xf4 | binary: 0b11110100
+        self.sp = 0xf4
 
     # MAR = Memory Address Register
     # MDR = Memory Data Register
@@ -32,17 +38,17 @@ class CPU:
     def ram_write(self, addr, data):
         self.ram[addr] = data
 
+    # load from file
+    # ---------------------------------
+    # sys.argv[1] reads the user's cmd line input after this python filename
+    # int("num_string", 2) converts binary string to int
+
     def load(self):
         """Load a program into memory."""
 
+
+        #program starts at ram[0]
         ram_addr = 0
-
-        # New way: load from file
-        # ---------------------------------
-        # sys.argv[1] reads the user's cmd line input after this python filename
-        # int("num_string", 2) converts binary string to int
-
-
 
         program = []
         program_file = open(sys.argv[1], 'r')
@@ -61,30 +67,15 @@ class CPU:
         # print(program)
         program_file.close()
 
-
-
-        # Old way: hardcoded program
-        # ---------------------------------
-        # For now, we've just hardcoded a program:
-
-
-
-        # program = [
-        #     # From print8.ls8
-        #     0b10000010, # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     0b01000111, # PRN R0
-        #     0b00000000,
-        #     0b00000001, # HLT
-        # ]
-
-
-        # ---------------------------------
-
+        # load each parsed line into the ram starting at 0
         for instruction in program:
             self.ram[ram_addr] = instruction
             ram_addr += 1
+
+
+    # ALU - returns math calculations on op_a and op_b
+    # ---------------------------------
+    # Does not increment the pc
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -97,6 +88,9 @@ class CPU:
         else:
             raise Exception("Unsupported ALU operation")
 
+
+    # Trace - run self.trace() to debug
+    # ---------------------------------
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -114,110 +108,129 @@ class CPU:
 
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
-
         print()
+        
 
-
+    # Running Loop
+    # ---------------------------------
     def run(self):
         """Run the CPU."""
+        self.running = True
 
-        # LDI | 82 | 0b10000010
-        def run_ldi(self,operand_a,operand_b):
 
-            # set operand_a (register #) to operand_b (integer)
-            print("LDI")
-            # print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
+        # Run Opcodes
+        # ---------------------------------
+        # HLT | 1 | 0b00000001
+        def run_hlt(self):
+            # Stop the program
+            # print("HALT")
+            self.running = False
 
-            reg_num = operand_a
-            reg_data = operand_b
-            self.reg[reg_num] = reg_data
+        # TODO RET | 17 | 0b00010001
+        def run_ret(self):
+            # return from the subroutine
+            # pop the value from the top of the stack
+            # store the value in the pc (program counter)
+            print("RET")
 
-            self.pc += 3   
+        # PUSH | 69 | 0b1000101
+        def run_push(self):
+            # push a value to the stack
+            # copy the value in reg[op_a] to ram[sp]
+            self.ram[self.sp] = self.reg[operand_a]
+            # print(f"PUSH: {self.reg[operand_a]} to ram[{self.sp}] from reg[{operand_a}]")
+
+            # decrement the stack pointer (sp)
+            self.sp -= 1
+
+            self.pc += 2
+
+        # POP | 70 | 0b01000110 
+        def run_pop(self):
+            # pop the value at the top of the stack
+            # into reg[op_a]
+            # increment stack pointer
+            self.sp += 1
+            self.reg[operand_a] = self.ram[self.sp]
+            # print(f"POP: {self.ram[self.sp]} to reg[{operand_a}] from ram[{self.sp}]")
+
+
+            self.pc += 2
 
         # PRN | 71 | 0b01000111
-        def run_prn(self,operand_a):
-            # print the value at register[operand_a]
-            # print("PRN")
+        def run_prn(self):
+            # print the value at reg[op_a]
+            # print(f"PRN: {self.reg[operand_a]} from reg[{operand_a}]")
             print(self.reg[operand_a])
             self.pc += 2
 
-        # HLT | 1 | 0b00000001
-        def run_hlt(self):
-            # print("HALT")
-            running = False
+        # LDI | 130 | 0b10000010
+        def run_ldi(self):
+            # load integer(op_b) into reg[op_a]
+            # print(f"LDI: load {operand_b} to reg[{operand_a}]")
+            self.reg[operand_a] = operand_b
 
+            self.pc += 3   
+
+        # ADD (alu) | 160 | 0b10100000 
+        def run_add(self):
+            # using the ALU: reg[op_a] += reg[op_b]
+            # print("ADD")
+            self.alu("ADD",operand_a,operand_b)
+            self.pc += 3
+
+        # MUL (alu) | 162 | 0b10100010
+        def run_mul(self):
+            # using the ALU: reg[op_a] *= reg[op_b]
+            # print("MUL")
+            self.alu("MUL",operand_a,operand_b)
+            self.pc += 3
+
+
+        # Select & Dispatch Opcodes
+        # ---------------------------------
         dispatch = {
-            # LDI | 82 | 0b10000010
-            0b10000010: run_ldi,
-            # PRN | 71 | 0b01000111
-            # 0b01000111: run_prn,
-            # ADD (alu) | 160 | 0b10100000
-            # 0b10100000: run_add,
-            # MUL (alu) | 162 | 0b10100010
-            # 0b10100010: run_mul,
             # HLT | 1 | 0b00000001
             0b00000001: run_hlt,
+            # RET | 17 | 0b00010001
+            0b00010001: run_ret,
+            # PUSH | 69 | 0b1000101
+            0b1000101: run_push,
+            # POP | 70 | 0b01000110 
+            0b01000110: run_pop,
+            # PRN | 71 | 0b01000111
+            0b01000111: run_prn,
+            # LDI | 130 | 0b10000010
+            0b10000010: run_ldi,
+            # ADD (alu) | 160 | 0b10100000
+            0b10100000: run_add,
+            # MUL (alu) | 162 | 0b10100010
+            0b10100010: run_mul,
         }
 
         cmd_list = dispatch.keys()
 
-        running = True
-        while running == True:
 
+        # Loop Starts
+        # ---------------------------------
+        while self.running == True:
             # run this for debugging
             # self.trace()
 
-            # fetch
+            # fetch command using program counter
             cmd_code = self.ram[self.pc]
 
             operand_a = self.ram[self.pc + 1]
             operand_b = self.ram[self.pc + 2]
 
-            # # LDI | 82 | 0b10000010
-            # if cmd_code == 0b10000010:
-            #     # set operand_a (register #) to operand_b (integer)
-            #     # print("LDI")
-            #     reg_num = operand_a
-            #     reg_data = operand_b
-
-            #     self.reg[reg_num] = reg_data
-
-            #     # print(f"LDI: set reg[{reg_num}]: {self.reg[reg_num]}")
-            #     self.pc += 3
-
-            # # PRN | 71 | 0b01000111
-            # elif cmd_code == 0b01000111:
-            #     # print the value at register[operand_a]
-            #     # print("PRN")
-            #     reg_num = operand_a
-            #     print(self.reg[reg_num])
-            #     self.pc += 2
-
-            # # ADD (alu) | 0b10100000 | 160
-            # elif cmd_code == 0b10100000:
-            #     # print("ADD")
-            #     self.alu("ADD",operand_a,operand_b)
-            #     self.pc += 3
-
-            # # MUL (alu) | 0b10100010 | 162
-            # elif cmd_code == 0b10100010:
-            #     # print("MUL")
-            #     self.alu("MUL",operand_a,operand_b)
-            #     self.pc += 3
-
-            # # HLT | 1 | 0b00000001
-            # elif cmd_code == 0b00000001:
-            #     # print("HALT")
-            #     running = False
-
-
             if cmd_code in cmd_list:
-                print(cmd_code)
-                dispatch[cmd_code](operand_a,operand_b)
-                # running = False
+                # valid command, dispatch a function
+                # print("cmd:",cmd_code)
+                cmd_run=dispatch[cmd_code](self)
 
             else:
+                # command not recognized
                 # to print binary add :b
                 print(f"I don't understand the command at ram[{self.pc}]: {self.ram[self.pc]} | {self.ram[self.pc]:b}")
                 print("Program exited")
-                running = False
+                self.running = False
