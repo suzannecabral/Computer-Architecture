@@ -131,7 +131,9 @@ class CPU:
             # return from the subroutine
             # pop the value from the top of the stack
             # store the value in the pc (program counter)
-            print("RET")
+            # print("RET")
+            self.sp += 1 
+            self.pc = self.ram[self.sp]
 
         # PUSH | 69 | 0b1000101
         def run_push(self):
@@ -154,7 +156,6 @@ class CPU:
             self.reg[operand_a] = self.ram[self.sp]
             # print(f"POP: {self.ram[self.sp]} to reg[{operand_a}] from ram[{self.sp}]")
 
-
             self.pc += 2
 
         # PRN | 71 | 0b01000111
@@ -163,6 +164,20 @@ class CPU:
             # print(f"PRN: {self.reg[operand_a]} from reg[{operand_a}]")
             print(self.reg[operand_a])
             self.pc += 2
+
+        # CALL | 80 | 0b01010000 
+        def run_call(self):
+            # calls a subroutine
+            # jumps to address stored in reg[op_a]
+            # address to return to AFTER the call is pushed to the stack
+
+            # print(f"CALL: a:{operand_a}")
+            # push next address to stack
+            self.ram[self.sp] = self.pc + 2
+            self.sp -= 1
+
+            # set PC to stored address
+            self.pc = self.reg[operand_a]
 
         # LDI | 130 | 0b10000010
         def run_ldi(self):
@@ -200,6 +215,8 @@ class CPU:
             0b01000110: run_pop,
             # PRN | 71 | 0b01000111
             0b01000111: run_prn,
+            # CALL | 80 | 0b01010000 
+            0b1010000: run_call,
             # LDI | 130 | 0b10000010
             0b10000010: run_ldi,
             # ADD (alu) | 160 | 0b10100000
